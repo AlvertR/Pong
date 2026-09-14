@@ -17,18 +17,22 @@ public class Program
         const int heightWindow = 450, widthWindow = 800;
 
         Raylib.InitWindow(widthWindow, heightWindow, "Pong");
-        //string basePath = AppDomain.CurrentDomain.BaseDirectory;
-        //string fulPath = Path.Combine(basePath, "Resource", "pong-image.png");
-        //Image icon = Raylib.LoadImage(fulPath);
-        //Raylib.SetWindowIcon(icon);
-        //Raylib.UnloadImage(icon);
+        string basePath = AppDomain.CurrentDomain.BaseDirectory;
+        string fulPath = Path.Combine(basePath, "Resource", "pong-image.png");
+        Image icon = Raylib.LoadImage(fulPath);
+        Raylib.ImageFormat(ref icon, PixelFormat.UncompressedR8G8B8A8);
+        Raylib.SetWindowIcon(icon);
+        Raylib.UnloadImage(icon);
         Raylib.SetTargetFPS(60);
 
         const int racketHeight = 100, racketWidth = 30, ballRadius = 30;
         Vector2 leftRacket = new Vector2(40, 10);
         Vector2 rightRacket = new Vector2(widthWindow - racketWidth - leftRacket.X, 10);
         Vector2 ballPosition = new Vector2(400, 225);
-        Vector2 ballVelocity = new Vector2(120, 120);
+        int defaultSpeed = 160;
+        Vector2 ballVelocity = new Vector2(defaultSpeed, defaultSpeed);
+        int ballMaxSpeed = 200;
+        int ballMinSpeed = 140;
         float deltaTime = 0;
         int leftPlayerScore = 0;
         int rightPlayerScore = 0;
@@ -78,6 +82,17 @@ public class Program
             }
         }
 
+        void ChangeAngle(Vector2 racket)
+        {
+            double racketCenter = racket.Y + (racketHeight / 2);
+            double impactPoint = (ballPosition.Y - racketCenter) / (racketHeight / 2);
+            impactPoint = Math.Max(-1.0, Math.Min(1.0, impactPoint));
+
+            ballVelocity.Y = (int)(impactPoint * ballMaxSpeed);
+            int directionX = (ballVelocity.X > 0) ? 1 : -1;
+            ballVelocity.X = (Math.Abs(ballVelocity.Y) < 3) ? directionX * defaultSpeed : directionX * ballMinSpeed;
+        }
+
         void MoveBall()
         {
             //ballY += ballVelocityY * deltaTime;
@@ -96,7 +111,9 @@ public class Program
             {
                 if (ballPosition.Y + ballRadius >= leftRacket.Y + 1 && ballPosition.Y - ballRadius <= leftRacket.Y + racketHeight)
                 {
-                    ballVelocity.X = ballVelocity.X * -1;
+                    ChangeAngle(leftRacket);
+                    ballPosition.X = leftRacket.X + racketWidth + ballRadius;
+                    ballVelocity.X = Math.Abs(ballVelocity.X);
                 }
                 else if (ballPosition.X - ballRadius <= 1)
                 {
@@ -109,7 +126,9 @@ public class Program
             {
                 if (ballPosition.Y + ballRadius >= rightRacket.Y + 1 && ballPosition.Y - ballRadius <= rightRacket.Y + racketHeight)
                 {
-                    ballVelocity.X = ballVelocity.X * -1;
+                    ChangeAngle(rightRacket);
+                    ballPosition.X = rightRacket.X - ballRadius;
+                    ballVelocity.X = -Math.Abs(ballVelocity.X);
                 }
                 else if (ballPosition.X + ballRadius >= widthWindow - 1)
                 {
@@ -119,7 +138,7 @@ public class Program
             }
         }
 
-        void Update()
+    void Update()
         {
             switch (gameState)
             {
