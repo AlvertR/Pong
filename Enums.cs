@@ -8,4 +8,11 @@
         PointEnd,
         End
     }
+
+    public enum Player
+    {
+        Unknown,
+        One,
+        Two
+    }
 }

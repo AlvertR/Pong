@@ -34,6 +34,7 @@ public class Program
         
         int leftPlayerScore = 0;
         int rightPlayerScore = 0;
+        Player lastPointWinner = Player.Unknown;
         
         float runningSeconds = 60;
         int displaySeconds = (int)runningSeconds;
@@ -56,15 +57,11 @@ public class Program
                         gameState = GameStatus.Playing;
                     break;
                 case GameStatus.Playing:
-                    if (Raylib.IsKeyDown(KeyboardKey.Up) && rightRacket.Position.Y > 0)
-                        rightRacket.SetPositionY(rightRacket.Position.Y - (rightRacket.Speed * deltaTime));
-                    if (Raylib.IsKeyDown(KeyboardKey.Down) && rightRacket.Position.Y < heightWindow - rightRacket.Height - 1)
-                        rightRacket.SetPositionY(rightRacket.Position.Y + (rightRacket.Speed * deltaTime));
+                    rightRacket.MoveUp(KeyboardKey.Up, deltaTime);
+                    rightRacket.MoveDown(KeyboardKey.Down, deltaTime, heightWindow);
+                    leftRacket.MoveUp(KeyboardKey.W, deltaTime);
+                    leftRacket.MoveDown(KeyboardKey.S, deltaTime, heightWindow);
 
-                    if (Raylib.IsKeyDown(KeyboardKey.W) && leftRacket.Position.Y > 0)
-                        leftRacket.SetPositionY(leftRacket.Position.Y - (leftRacket.Speed * deltaTime));
-                    if (Raylib.IsKeyDown(KeyboardKey.S) && leftRacket.Position.Y < heightWindow - leftRacket.Height - 1)
-                        leftRacket.SetPositionY(leftRacket.Position.Y + (leftRacket.Speed * deltaTime));
                     if (Raylib.IsKeyPressed(KeyboardKey.P))
                     {
                         if (ball.Velocity.X > 0)
@@ -77,7 +74,6 @@ public class Program
                 case GameStatus.Paused:
                     if (Raylib.IsKeyPressed(KeyboardKey.C))
                     {
-                        ball.ResetBall();
                         gameState = GameStatus.Playing;
                     }
                     if (Raylib.IsKeyPressed(KeyboardKey.T))
@@ -118,6 +114,7 @@ public class Program
                 {
                     rightPlayerScore++;
                     gameState = GameStatus.PointEnd;
+                    lastPointWinner = Player.Two;
                     ball.IsRightDirection = true;
                 }
             }
@@ -134,6 +131,7 @@ public class Program
                 {
                     leftPlayerScore++;
                     gameState = GameStatus.PointEnd;
+                    lastPointWinner = Player.One;
                     ball.IsRightDirection = false;
                 }
             }
@@ -179,7 +177,7 @@ public class Program
                     Raylib.DrawText("Presiona T para Terminar", 10, 70, 42, Color.White);
                     break;
                 case GameStatus.PointEnd:
-                    if (rightPlayerScore > leftPlayerScore)
+                    if (lastPointWinner == Player.Two)
                     {
                         Raylib.DrawText("Punto para jugador 2", 10, 10, 42, Color.White);
                         Raylib.DrawText("Jugador 1: " + leftPlayerScore, 10, 70, 42, Color.White);

@@ -43,9 +43,12 @@ namespace Pong
             impactPoint = Math.Max(-1.0, Math.Min(1.0, impactPoint));
 
             var velocityY = (int)(impactPoint * MaxMagnitudeVel);
-            int directionX = (Velocity.X > 0) ? 1 : -1;
-            float magnitudeX = (Math.Abs(Velocity.Y) < 3) ? directionX * DefaultMagnitudeVel : directionX * MinMagnitudeVel;
-            var velocityX = directionX > 0 ? Math.Abs(magnitudeX) * -1 : Math.Abs(magnitudeX);
+            int originalDirectionX = (Velocity.X > 0) ? 1 : -1;
+            int newDirectionX = originalDirectionX * -1;
+
+            float magnitudeX = (Math.Abs(Velocity.Y) < 3) ? originalDirectionX * DefaultMagnitudeVel : originalDirectionX * MinMagnitudeVel;
+            var velocityX = Math.Abs(magnitudeX) * newDirectionX;
+
             Vector2 normalize = Vector2.Normalize(new Vector2(velocityX, velocityY));
             this.Velocity = normalize * BaseSpeed;
         }

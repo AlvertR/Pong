@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using Raylib_cs;
+using System.Numerics;
 
 namespace Pong
 {
@@ -25,6 +26,18 @@ namespace Pong
         public void SetPositionY(float position)
         {
             this.Position = new Vector2(this.Position.X, position);
+        }
+
+        public void MoveUp(KeyboardKey upKey, float deltaTime)
+        {
+            if (Raylib.IsKeyDown(upKey) && this.Position.Y > 0)
+                this.SetPositionY(this.Position.Y - (this.Speed * deltaTime));
+        }
+
+        public void MoveDown(KeyboardKey downKey, float deltaTime, int heightWindow)
+        {
+            if (Raylib.IsKeyDown(downKey) && this.Position.Y < heightWindow - this.Height - 1)
+                this.SetPositionY(this.Position.Y + (this.Speed * deltaTime));
         }
     }
 }
